@@ -46,10 +46,10 @@ Depencies for running FCNN.ipynb:
 
 ### Methods
 <figure>
-  <img src="readme_images/pspnet.png"/>
+<img src="readme_images/pspnet.png"/>
 </figure>
- <p></p>
- [Image citation](https://hszhao.github.io/projects/pspnet/)
+<p></p>
+Image citation: https://hszhao.github.io/projects/pspnet/
 
 After preliminiary experiments using a pre-trained VGG 19 layer network as an encoder, replacing the fully-connected layers with 1x1 convultions, and using transposed convolutions with skip connections from the encoder's pooling layers to upsample as a decoder, as described in [4], I decided to keep experimenting and try to replicate the results of a state-of-the-art network. My best results came from a newtork very similar to PSPnet as described in [5]. Above is broad overview diagram of the network acrhitecture. Below is the exact architecture I used. In the last layers of my encoder, instead of max-pooling, I use dilated or atrous convolutions [1], which preserves the number of parameters while increasing the field of view without having to downsample. Therefore, the pre-trained VGG 19 weights can be used in the decoder without losing important spatial information, which may be irrelevant for classification tasks but is very helpful for pixel level segmentation. Transposed convolutions are used after the pyramid pooling module to upsample pixel level predictions to the original input size. Below is the full network architecture broken down into three modules, Encoder, PSP Decoder, Upsample Decoder.
 

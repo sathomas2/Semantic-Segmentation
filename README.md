@@ -5,9 +5,6 @@
  <p></p>
  
 ### Overview
-Rathern than VGG-16, I used VGG-19 and the weights trained on ImageNet provided by Udacity in the Deep Learning Foundations Nanodegree. My FCNN_model.py uses code provided by that nanodegree to build the network architecture, allowing me to more easily manipulate the original architecture and use useful techniques, such as atrous convolutions instead of max pooling layers.
-
-
 In this repository, I will use a variation of a Fully Convolutional Neural Network with a Pyramid Pooling Module that is pre-trained on ImageNet to perform Semantic Segmentation on [KITTI Road Dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) [3] and the [Cityscapes Dataset](https://www.cityscapes-dataset.com/) [2].  
 
 The contents of this repository include:
@@ -34,7 +31,7 @@ root
 ```
 helper.py and labels.py provide useful functions used in FCNN.ipynb where the actual network is trained. I like to train deep nets inside a jupyter notebook so I can print out images after every epoch to visually see how the network is learning. I trained the networks incrementally over days, so you can only see results from the most recent training in my notebook. I kept results from both the cityscapes training and the KITTI training so a viewer who does not have access to a GPU can see for themselves. inference.py freezes the model graph for quicker inference and saves the image results of the trained network for both KITTI and Cityscapes test datasets, and I have included my results in the run folder of this repository. evaluation_KITTI.ipynb can be used to calculate per-pixel per-class accuracy using the frozen graph on the KITTI Dataset. This is already done for some classes inside FCNN.ipynb for the Cityscapes Dataset.
 
-NOTE: I could not include the checkpoint files because they are exceed GitHub's 100mb file-size policy, so you will have to run the networks on the datasets for yourself. You will need to download VGG 19 NPY file from [here](https://mega.nz/#!xZ8glS6J!MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs).
+NOTE: I could not include the checkpoint files because they exceed GitHub's 100mb file-size policy, so you will have to run the networks on the datasets for yourself. You will need to download VGG 19 NPY file from [here](https://mega.nz/#!xZ8glS6J!MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs).
 
 Depencies for running FCNN.ipynb:
  - Python 3
@@ -49,9 +46,10 @@ Depencies for running FCNN.ipynb:
 <img src="readme_images/pspnet.png"/>
 </figure>
 <p></p>
-Image citation: https://hszhao.github.io/projects/pspnet/
 
-After preliminiary experiments using a pre-trained VGG 19 layer network as an encoder, replacing the fully-connected layers with 1x1 convultions, and using transposed convolutions with skip connections from the encoder's pooling layers to upsample as a decoder, as described in [4], I decided to keep experimenting and try to replicate the results of a state-of-the-art network. My best results came from a newtork very similar to PSPnet as described in [5]. Above is broad overview diagram of the network acrhitecture. Below is the exact architecture I used. In the last layers of my encoder, instead of max-pooling, I use dilated or atrous convolutions [1], which preserves the number of parameters while increasing the field of view without having to downsample. Therefore, the pre-trained VGG 19 weights can be used in the decoder without losing important spatial information, which may be irrelevant for classification tasks but is very helpful for pixel level segmentation. Transposed convolutions are used after the pyramid pooling module to upsample pixel level predictions to the original input size. Below is the full network architecture broken down into three modules, Encoder, PSP Decoder, Upsample Decoder.
+After preliminary experiments using a pre-trained VGG 19 layer network as an encoder, replacing the fully-connected layers with 1x1 convultions and using transposed convolutions with skip connections from the encoder's pooling layers to upsample as a decoder, as described in [4], I decided to keep experimenting and try to replicate the results of a state-of-the-art network. My best results came from a newtork very similar to PSPnet as described in [5]. Above is broad overview diagram of the network acrhitecture. I borrowed the image from [here](https://hszhao.github.io/projects/pspnet/). 
+
+Below is the exact architecture I use. In the last layers of my encoder, instead of max-pooling, I use dilated or atrous convolutions [1], which preserves the number of parameters while increasing the field of view without having to downsample. Therefore, the pre-trained VGG 19 weights can be used in the decoder without losing important spatial information, which may be irrelevant for classification tasks but is very helpful for pixel level segmentation. Transposed convolutions are used after the pyramid pooling module to upsample pixel level predictions to the original input size. Below the full network architecture is broken down into three modules, Encoder, PSP Decoder, Upsample Decoder.
 
 | Layer     | Description | 
 |:--------------:|:-------------:| 
@@ -104,25 +102,25 @@ After preliminiary experiments using a pre-trained VGG 19 layer network as an en
 | Conv Logits   | filter=3x3, stride=1, num_layers=num_classes, activation=None|
 | Out | softmax |
 
-To help combat overfitting, some data augmentation was used. Before being processed by the network, images are randomly cropped to maintain the original image's aspect ratio, and radomly flipped horizontally. Since this network is fully convolutional, it can accept images of any size. Image inputs are all reduced in size to reduce computation time, but for both datasets aspect ratios were always maintained.
+To help combat overfitting, some data augmentation is used. Before being processed by the network, images are randomly cropped to maintain the original image's aspect ratio, and radomly flipped horizontally. Since this network is fully convolutional, it can accept images of any size. Image inputs are all reduced in size to reduce computation time, but for both datasets aspect ratios were always maintained.
 
 ### Results
 KITTI validation set: 
-Mean IOU: 0.9533
+- Mean IOU: 0.9533
 
 Because I split the KITTI dataset randomly into validation and training sets during training, I could not recover the exact validation set I used. But on all the training data, I received the following results (see evaluation_KITTI.ipynb for the calculation):
-% of road pixels accurately labeled: 0.9826
-% of background pixels accurately labeled: 0.9882
+- % of road pixels accurately labeled: 0.9826
+- % of background pixels accurately labeled: 0.9882
 
 
 Cityscapes validation set:
-Mean IOU: 0.4955
+- Mean IOU: 0.4955
 
 Pixel accuracy by some of the classes:
-% of road pixels accurately labeled: 0.9529
-% of cars pixels accurately labeled: 0.8735
-% of traffic signs pixels accurately labeled: 0.2829
-% of persons pixels accurately labeled: 0.4025
+- % of road pixels accurately labeled: 0.9529
+- % of cars pixels accurately labeled: 0.8735
+- % of traffic signs pixels accurately labeled: 0.2829
+- % of persons pixels accurately labeled: 0.4025
 
 The network is very good with the road and with cars, but with smaller, more difficult objects, like persons and traffic signs, it is less successful.
 
@@ -147,9 +145,8 @@ Cityscapes examples:
  <p></p>
 
 ### References
-[1] L. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. "Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs." arXiv:1606.00915, 2016.
-[2] M. Cordts, M. Omran, S. Ramos, T. Rehfeld, M. Enzweiler, R. Benenson, U. Franke, S. Roth, and B. Schiele. "The Cityscapes Dataset for Semantic Urban Scene Understanding," in Proc. of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2016.
+1. L. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. "Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs." arXiv:1606.00915, 2016.
+2. M. Cordts, M. Omran, S. Ramos, T. Rehfeld, M. Enzweiler, R. Benenson, U. Franke, S. Roth, and B. Schiele. "The Cityscapes Dataset for Semantic Urban Scene Understanding," in Proc. of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2016.
 [3] J. Fritsch, T. Kuehnl, and A. Geiger. "A New Performance Measure and Evaluation Benchmark for Road Detection Algorithms," in Proc. of the International Conference on Intelligent Transportation Systems (ITSC), 2013.
-[4] J. Long, E. Shelhamer, and T. Darrell. Fully convolutional networks for semantic segmentation. In CVPR, 2015.
-[5] H. Zhao, J. Shi, X. Qi, X. Wang, and J. Jia. "Pyramid Scene Parsing Network." arXiv:1612.01105, 2017.
-
+3. J. Long, E. Shelhamer, and T. Darrell. Fully convolutional networks for semantic segmentation. In CVPR, 2015.
+4. H. Zhao, J. Shi, X. Qi, X. Wang, and J. Jia. "Pyramid Scene Parsing Network." arXiv:1612.01105, 2017.

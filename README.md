@@ -21,12 +21,6 @@ root
 |   inference.py
 |   evaluation_KITTI.ipynb
 |
-|___KITI_checks
-|   |   ...
-|
-|___cityscape_checks
-|   |   ...
-|
 |___readme_images
 |   |   ...
 |
@@ -39,6 +33,8 @@ root
         |   ...
 ```
 helper.py and labels.py provide useful functions used in FCNN.ipynb where the actual network is trained. I like to train deep nets inside a jupyter notebook so I can print out images after every epoch to visually see how the network is learning. I trained the networks incrementally over days, so you can only see results from the most recent training in my notebook. I kept results from both the cityscapes training and the KITTI training so a viewer who does not have access to a GPU can see for themselves. inference.py freezes the model graph for quicker inference and saves the image results of the trained network for both KITTI and Cityscapes test datasets, and I have included my results in the run folder of this repository. evaluation_KITTI.ipynb can be used to calculate per-pixel per-class accuracy using the frozen graph on the KITTI Dataset. This is already done for some classes inside FCNN.ipynb for the Cityscapes Dataset.
+
+NOTE: I could not include the checkpoint files because they are exceed GitHub's 100mb file-size policy, so you will have to run the networks on the datasets for yourself. You will need to download VGG 19 NPY file from [here (https://mega.nz/#!xZ8glS6J!MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs).
 
 Depencies for running FCNN.ipynb:
  - Python 3
@@ -80,7 +76,7 @@ Encoder:
 | Conv5_2          | filter=3x3, stride=1, num_layers=512, activation=ReLU|  
 | Conv5_3          | filter=3x3, stride=1, num_layers=512, activation=ReLU| 
 | Atrous Conv5_4   | filter=3x3, stride=1, num_layers=512, atrous_rate=4, activation=ReLU|
-|     |     |
+|     |     /
 
 Decoder PSP:
 | Layer     | Description | 
@@ -100,7 +96,7 @@ Decoder PSP:
 | 1x1Conv8      | input=Atrous Conv5_4, num_layers=256, activation=Leaky ReLU, batch_norm=True|
 | Fuse8         | input=[Upsample7_1, Upsample7_2, Upsample7_3, Upsample7_3, 1x1Conv8], method=concatenate along channel axis|
 | 1x1Conv9      | input=Fuse8, num_layers=512, activation=Leaky ReLU, batch_norm=True| 
-|     |     |
+|     |     /
 
 Decoder Usample:
 | Layer     | Description | 
@@ -111,7 +107,7 @@ Decoder Usample:
 | Conv13        | filter=3x3, stride=1, num_layers=64, activation=Leaky ReLU, batch_norm=False| 
 | Conv Logits   | filter=3x3, stride=1, num_layers=num_classes, activation=None|
 | Out | softmax |
-|     |     |
+|     |     /
 
 To help combat overfitting, some data augmentation was used. Before being processed by the network, images are randomly cropped to maintain the original image's aspect ratio, and radomly flipped horizontally. Since this network is fully convolutional, it can accept images of any size. Image inputs are all reduced in size to reduce computation time, but for both datasets aspect ratios were always maintained.
 

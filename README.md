@@ -3,6 +3,7 @@
   <img src="readme_images/open.png"/>
 </figure>
  <p></p>
+ NOTE: I have updated my Semantic Segmentation network to produce more accurate results by using ResNet152 as a backbone instead of VGG19, as well as updating my decoder framework, using Google's DeepLabV3 as inspiration. To see how this new network works, which outperforms the one in this repository, please visit my Lyft Perception Challenge repo.
  
 ### Overview
 In this repository, I will use a variation of a Fully Convolutional Neural Network with a Pyramid Pooling Module that is pre-trained on ImageNet to perform Semantic Segmentation on [KITTI Road Dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) [3] and the [Cityscapes Dataset](https://www.cityscapes-dataset.com/) [2].  
